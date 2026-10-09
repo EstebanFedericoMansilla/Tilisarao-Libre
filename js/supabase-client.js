@@ -5,8 +5,8 @@
 //  el acceso real lo controlan las políticas RLS de sql/schema.sql
 // ============================================================================
 
-export const SUPABASE_URL = 'PEGA_TU_PROJECT_URL';        // https://xxxxxxxx.supabase.co
-export const SUPABASE_ANON_KEY = 'PEGA_TU_ANON_KEY';      // eyJhbGciOi...
+export const SUPABASE_URL = 'https://glpoygnydytctaqamzug.supabase.co';   // Project ID: glpoygnydytctaqamzug
+export const SUPABASE_ANON_KEY = 'sb_publishable_mSPNEeCnpXGDI01YXDgGnA_3l3Ak3o4';
 
 export const isConfigured =
   SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 40;
