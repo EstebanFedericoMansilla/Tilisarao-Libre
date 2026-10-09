@@ -158,22 +158,23 @@ create policy "productos delete own" on storage.objects
 
 -- ---------------------------------------------------------------------------
 -- 7. DATOS DE EJEMPLO (imagenes servidas desde /assets del repo)
+--     Los id estan fijos asi que correr esto de nuevo NO duplica nada.
 -- ---------------------------------------------------------------------------
 insert into public.products (id, title, description, price, nick, image_url, user_id)
 values
-  (gen_random_uuid(), 'Teclado Mecanico RGB',
+  ('a1000000-0000-4000-8000-000000000001', 'Teclado Mecanico RGB',
    'Teclado gamer con retroiluminacion RGB y switches azules. Perfecto para gaming y trabajo.',
    19990, 'tilisarao', 'assets/productos/IMG-20230621-WA0012_1761418873485_kwaqr6.jpg', null),
-  (gen_random_uuid(), 'Mouse Gamer 7200DPI',
+  ('a1000000-0000-4000-8000-000000000002', 'Mouse Gamer 7200DPI',
    'Mouse optico con 7 botones programables y luces LED. Ideal para gamers profesionales.',
    8500, 'tilisarao', 'assets/productos/IMG-20230621-WA0015_1761419549644_8y22ts.jpg', null),
-  (gen_random_uuid(), 'Auriculares Gamer',
+  ('a1000000-0000-4000-8000-000000000003', 'Auriculares Gamer',
    'Auriculares con micrófono y sonido envolvente para gaming. Comodidad garantizada.',
    12300, 'tilisarao', 'assets/productos/IMG-20230621-WA0017_1761418540652_9wd9y4.jpg', null),
-  (gen_random_uuid(), 'Monitor Gaming 27"',
+  ('a1000000-0000-4000-8000-000000000004', 'Monitor Gaming 27"',
    'Monitor LED con 144Hz y tiempo de respuesta 1ms. Experiencia gaming inmersiva.',
    69990, 'tilisarao', 'assets/productos/IMG-20230621-WA0002_1761413453954_tx5gkn.jpg', null),
-  (gen_random_uuid(), 'SSD NVMe 1TB',
+  ('a1000000-0000-4000-8000-000000000005', 'SSD NVMe 1TB',
    'Almacenamiento NVMe de alta velocidad para juegos y aplicaciones.',
    49990, 'tilisarao', 'assets/productos/IMG-20230621-WA0003_1761413182160_s58l2o.jpg', null)
 on conflict (id) do nothing;

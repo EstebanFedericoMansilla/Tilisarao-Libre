@@ -274,6 +274,8 @@ function showProductDetail(product) {
     ? `<img src="${esc(product.image_url)}" alt="${esc(product.title)}" style="width:100%;max-height:400px;object-fit:contain;border-radius:8px;">`
     : '<div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#666;border-radius:8px;">Sin imagen disponible</div>';
 
+  const esDuenio = !!(currentSession && product.user_id && product.user_id === currentSession.user.id);
+
   content.innerHTML = `
     <div class="product-detail-info">
       <h2 class="product-detail-title">${esc(product.title)}</h2>
@@ -288,6 +290,10 @@ function showProductDetail(product) {
       <button class="btn btn-secondary" id="detailCartBtn" style="width:100%;margin-top:10px;">
         <i class="fas fa-cart-plus"></i> Agregar al carrito
       </button>
+      ${esDuenio ? `
+        <button class="btn btn-danger" id="deleteProductBtn" style="width:100%;margin-top:10px;">
+          <i class="fas fa-trash"></i> Eliminar mi publicación
+        </button>` : ''}
     </div>
     <div>${imageHtml}</div>
   `;
@@ -299,6 +305,12 @@ function showProductDetail(product) {
   content.querySelector('#detailCartBtn').addEventListener('click', () => {
     addToCart(product.id);
   });
+
+  if (esDuenio) {
+    content.querySelector('#deleteProductBtn').addEventListener('click', () => {
+      deleteProduct(product.id);
+    });
+  }
 
   modal.style.display = 'block';
 }
@@ -407,6 +419,42 @@ async function createProduct() {
   } finally {
     if (button) button.disabled = false;
   }
+}
+
+// --------------------------------------------------------------------- borrar
+async function deleteProduct(productId) {
+  if (!currentSession) {
+    alert('Tenés que iniciar sesión para administrar tu publicación');
+    window.location.href = 'auth.html';
+    return;
+  }
+
+  const product = productos.find((p) => p.id === productId);
+  const titulo = product ? product.title : 'este producto';
+
+  if (!confirm('¿Eliminar "' + titulo + '"?\n\nLa publicación se borra para todos y no se puede deshacer.')) {
+    return;
+  }
+
+  const { error } = await sb
+    .from('products')
+    .delete()
+    .eq('id', productId)
+    .eq('user_id', currentSession.user.id);
+
+  if (error) {
+    console.error('Error deleting product:', error);
+    alert('No se pudo eliminar: ' + errMsg(error));
+    return;
+  }
+
+  cartItems = cartItems.filter((item) => item.id !== productId);
+  updateCartCount();
+  saveCart();
+
+  closeModal();
+  alert('Publicación eliminada');
+  await loadProducts();
 }
 
 // ------------------------------------------------------------------ sesión
@@ -545,5 +593,6 @@ window.sortProducts = sortProducts;
 window.openContactModal = openContactModal;
 window.closeContactModal = closeContactModal;
 window.createProduct = createProduct;
+window.deleteProduct = deleteProduct;
 window.logout = logout;
 window.checkAuthStatus = checkAuthStatus;

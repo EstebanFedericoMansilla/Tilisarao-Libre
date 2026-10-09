@@ -5,7 +5,7 @@
 //  así los precios y productos siempre están actualizados.
 // ============================================================================
 
-const CACHE_NAME = 'tilisarao-libre-v1';
+const CACHE_NAME = 'tilisarao-libre-v2';
 
 const ASSETS_TO_CACHE = [
   './',
