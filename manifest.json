@@ -1,0 +1,58 @@
+{
+  "name": "Tilisarao Libre - Mercado de Tilisarao",
+  "short_name": "Tilisarao Libre",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#fff159",
+  "description": "Mercado de Tilisarao: comprá y vendé en tu ciudad y coordiná la compra directo por WhatsApp.",
+  "categories": ["shopping", "business"],
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Vender un producto",
+      "short_name": "Vender",
+      "description": "Publicá tu producto en Tilisarao Libre",
+      "url": "./index.html?vender=1",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ingresar",
+      "short_name": "Ingresar",
+      "description": "Ingresá con tu cuenta",
+      "url": "./auth.html",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

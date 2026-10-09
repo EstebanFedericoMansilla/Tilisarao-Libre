@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tilisarao Libre</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- PWA & Mobile Install -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#fff159">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tilisarao Libre">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
     <style>
         * {
             margin: 0;
@@ -228,6 +238,83 @@
         .no-results h3 {
             margin-bottom: 8px;
             color: #333;
+        }
+
+        /* Install app (PWA) */
+        .install-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 24px;
+            padding: 18px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            border-left: 5px solid #fff159;
+        }
+
+        .install-card.hidden {
+            display: none;
+        }
+
+        .install-icon {
+            flex-shrink: 0;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #fff159;
+            color: #1259c3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .install-text {
+            flex: 1;
+        }
+
+        .install-text h3 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .install-text p {
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .install-button {
+            flex-shrink: 0;
+            background: #3483fa;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .install-button:hover {
+            background: #2968c8;
+        }
+
+        @media (max-width: 600px) {
+            .install-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .install-button {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         .product-card {
@@ -940,6 +1027,20 @@
         <div class="products-grid" id="products-container">
             <!-- Los productos se cargarán aquí dinámicamente -->
         </div>
+
+        <!-- Tarjeta "Instalar App" -->
+        <div id="installCard" class="install-card">
+            <div class="install-icon">
+                <i class="fas fa-mobile-screen-button"></i>
+            </div>
+            <div class="install-text">
+                <h3>Instalar Tilisarao Libre</h3>
+                <p>Agregá el acceso directo en tu celular y entrá en un toque, sin escribir la dirección.</p>
+            </div>
+            <button id="btnInstallApp" class="install-button">
+                <i class="fas fa-download"></i> Instalar ahora
+            </button>
+        </div>
     </main>
 
     <footer class="footer">
@@ -1027,5 +1128,50 @@
     </div>
 
     <script type="module" src="js/app.js"></script>
+
+    <!-- PWA: instalación + service worker -->
+    <script>
+        let deferredPrompt = null;
+        const installCard = document.getElementById('installCard');
+        const btnInstallApp = document.getElementById('btnInstallApp');
+
+        const isIos = () => /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+        const isInStandaloneMode = () => ('standalone' in window.navigator) && window.navigator.standalone;
+
+        if (isIos() && !isInStandaloneMode()) {
+            btnInstallApp.addEventListener('click', () => {
+                alert('Para instalar en iPhone:\n\n1. Tocá el botón "Compartir" (el cuadrado con la flecha hacia arriba).\n2. Elegí "Agregar a pantalla de inicio".\n3. Tocá "Agregar" arriba a la derecha.');
+            });
+        } else {
+            btnInstallApp.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    if (outcome === 'accepted') installCard.classList.add('hidden');
+                } else {
+                    alert('Abrí esta página desde tu celular (Chrome o Edge) para instalarla como aplicación.');
+                }
+            });
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installCard.classList.add('hidden');
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(
+                    () => console.log('Service Worker registrado'),
+                    (err) => console.log('Service Worker falló:', err)
+                );
+            });
+        }
+    </script>
 </body>
 </html>

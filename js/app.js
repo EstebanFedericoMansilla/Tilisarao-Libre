@@ -510,6 +510,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sortButtons[1]) sortButtons[1].addEventListener('click', () => sortProducts('desc'));
   if (sortButtons[2]) sortButtons[2].addEventListener('click', () => sortProducts('recent'));
 
+  // Atajo del ícono instalado: index.html?vender=1 abre directo el formulario
+  if (new URLSearchParams(window.location.search).get('vender') === '1') {
+    setTimeout(openContactModal, 400);
+  }
+
   window.onclick = (event) => {
     document.querySelectorAll('.modal').forEach((modal) => {
       if (event.target === modal) modal.style.display = 'none';
