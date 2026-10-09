@@ -59,7 +59,20 @@ assets/productos/       Imágenes de ejemplo
 | Editar/borrar | Solo el dueño del producto (RLS `user_id = auth.uid()`) |
 | Carrito | Guardado en `localStorage`, sin backend |
 
-## 5. Datos sensibles
+## 5. Cobranzas: WhatsApp
+
+No hay pasarela de pago: la venta se cierra por WhatsApp.
+
+- Cada publicación guarda el **WhatsApp del vendedor** (columna `products.phone`, campo del formulario).
+- En la ficha del producto, **"Comprar por WhatsApp"** abre `wa.me/<numero>` con el mensaje
+  *"¡Hola! Vi tu publicación en Tilisarao Libre y quiero comprar…"*.
+- **"Comprar por WhatsApp"** del carrito manda el pedido con los ítems y el total.
+- El número se arma solo: si cargás `2664123456` queda `5492664123456`; si ya empezás con `54` o `549` se respeta.
+
+Si ya tenés publicaciones creadas, corré `sql/2-whatsapp.sql` en el SQL Editor y después
+actualizalas desde Table Editor → `products` → columna `phone`.
+
+## 6. Datos sensibles
 
 - La **contraseña de la base** de Supabase no se usa en la web ni se guarda en el repo.
 - El archivo `Mail y cuenta de Github.txt` está en `.gitignore` a propósito: **nunca** se sube.

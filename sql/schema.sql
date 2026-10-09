@@ -25,6 +25,7 @@ create table if not exists public.products (
   title       text not null check (char_length(title) between 2 and 120),
   description text not null default '',
   price       numeric(12,2) not null default 0 check (price >= 0),
+  phone       text not null default '',
   image_url   text,
   created_at  timestamptz not null default now()
 );

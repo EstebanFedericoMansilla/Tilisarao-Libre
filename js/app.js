@@ -31,6 +31,33 @@ function errMsg(error) {
   return (error && (error.message || error.error_description)) || 'Error desconocido';
 }
 
+// ------------------------------------------------------------------ whatsapp
+function waNumber(phone) {
+  let d = String(phone || '').replace(/\D/g, '');
+  if (!d) return null;
+  if (d.startsWith('0')) d = '549' + d.slice(1);
+  else if (!d.startsWith('54')) d = '549' + d;
+  return d;
+}
+
+function openWhatsApp(number, text) {
+  window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
+}
+
+function contactSeller(product) {
+  const num = waNumber(product.phone);
+  if (!num) {
+    alert('Este vendedor no cargó su WhatsApp en la publicación.');
+    return;
+  }
+  const texto =
+    '¡Hola! Vi tu publicación en *Tilisarao Libre* y quiero comprar:\n\n' +
+    '• ' + product.title + '\n' +
+    '• $' + money(product.price) + '\n\n' +
+    '¿Sigue disponible? ¡Gracias!';
+  openWhatsApp(num, texto);
+}
+
 // ------------------------------------------------------------ carga productos
 async function loadProducts() {
   const container = document.getElementById('products-container');
@@ -182,7 +209,46 @@ function procederAlPago() {
     alert('El carrito está vacío');
     return;
   }
-  alert('El pago está disponible próximamente. Por ahora coordiná la compra con el vendedor.');
+
+  const vendedores = {};
+  cartItems.forEach((item) => {
+    const nick = item.nick || 'usuario';
+    if (!vendedores[nick]) {
+      const catalogo = productos.find((p) => p.id === item.id) || {};
+      vendedores[nick] = { nick, phone: catalogo.phone || item.phone, items: [], total: 0 };
+    }
+    vendedores[nick].items.push(item);
+    vendedores[nick].total += Number(item.price) * item.cantidad;
+  });
+
+  const lista = Object.values(vendedores);
+
+  if (lista.length > 1) {
+    alert(
+      'Tu carrito tiene productos de ' + lista.length +
+      ' vendedores distintos. Abrí cada producto y compralo por WhatsApp a cada uno.'
+    );
+    return;
+  }
+
+  const v = lista[0];
+  const num = waNumber(v.phone);
+  if (!num) {
+    alert('El vendedor no cargó su WhatsApp en la publicación.');
+    return;
+  }
+
+  const lineas = v.items
+    .map((i) => '• ' + i.title + ' x' + i.cantidad + ' - $' + money(Number(i.price) * i.cantidad))
+    .join('\n');
+
+  const texto =
+    '¡Hola! Quiero hacer este pedido de *Tilisarao Libre*:\n\n' +
+    lineas + '\n\n' +
+    '*Total: $' + money(v.total) + '*\n\n' +
+    '¿Coordinamos el pago y la entrega? ¡Gracias!';
+
+  openWhatsApp(num, texto);
 }
 
 function saveCart() {
@@ -216,14 +282,22 @@ function showProductDetail(product) {
       <div style="font-size:14px;color:#666;margin:10px 0;">
         <i class="fas fa-user"></i> Vendido por: ${esc(product.nick || 'usuario')}
       </div>
-      <button class="buy-button" id="buyNowBtn">Comprar ahora</button>
+      <button class="buy-button" id="buyNowBtn" style="background:#25D366;">
+        <i class="fab fa-whatsapp"></i> Comprar por WhatsApp
+      </button>
+      <button class="btn btn-secondary" id="detailCartBtn" style="width:100%;margin-top:10px;">
+        <i class="fas fa-cart-plus"></i> Agregar al carrito
+      </button>
     </div>
     <div>${imageHtml}</div>
   `;
 
   content.querySelector('#buyNowBtn').addEventListener('click', () => {
+    contactSeller(product);
+  });
+
+  content.querySelector('#detailCartBtn').addEventListener('click', () => {
     addToCart(product.id);
-    showCart();
   });
 
   modal.style.display = 'block';
@@ -281,10 +355,14 @@ async function createProduct() {
   const title = document.getElementById('productTitle').value.trim();
   const description = document.getElementById('productDescription').value.trim();
   const price = parseFloat(document.getElementById('productPrice').value);
+  const phone = document.getElementById('productPhone').value.trim();
   const file = document.getElementById('productImage').files[0];
 
   if (!title) return alert('El título del producto es obligatorio');
   if (isNaN(price) || price < 0) return alert('El precio debe ser un número mayor o igual a 0');
+  if (!phone || String(phone).replace(/\D/g, '').length < 8) {
+    return alert('Cargá tu WhatsApp con código de área, ej: 2664123456');
+  }
   if (file && !file.type.startsWith('image/')) return alert('Solo se permiten imágenes');
   if (file && file.size > 5 * 1024 * 1024) return alert('La imagen no puede superar 5 MB');
 
@@ -312,6 +390,7 @@ async function createProduct() {
       title,
       description,
       price,
+      phone,
       image_url,
       user_id: currentSession.user.id,
       nick: currentUser ? currentUser.nick : 'usuario',
@@ -452,6 +531,9 @@ window.clearCart = clearCart;
 window.procederAlPago = procederAlPago;
 window.showProductDetail = showProductDetail;
 window.closeModal = closeModal;
+window.contactSeller = contactSeller;
+window.waNumber = waNumber;
+window.openWhatsApp = openWhatsApp;
 window.handleSearch = handleSearch;
 window.searchProducts = searchProducts;
 window.sortProducts = sortProducts;
