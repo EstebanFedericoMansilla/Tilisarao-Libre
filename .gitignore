@@ -1,0 +1,17 @@
+# Datos sensibles / notas personales (no subir nunca)
+Mail y cuenta de Github.txt
+Mejoras de la Web.txt
+Pasos para crear Tokens para hacer deploys.docx
+*.local.txt
+.env
+.env.*
+
+# Editores y SO
+.qodo/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Node (ya no se usa, por si aparece de nuevo)
+node_modules/
+npm-debug.log*
